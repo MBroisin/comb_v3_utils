@@ -1,6 +1,8 @@
 import numpy
 import cv2
 import json
+import os
+
 
 def _convert_to_image_coordinates(x, y, max_x, max_y):
     new_j = max_y - y
@@ -8,15 +10,17 @@ def _convert_to_image_coordinates(x, y, max_x, max_y):
     return new_i, new_j
 
 
-def get_frame_layout(resolution=1, padding=0, show_outline=True, show_comb_outline=True, show_screws=True, show_grooves=True, show_actuators=True, show_accelerometers=True, show_vleds=True, show_irleds=True, display_names=True):
+def get_frame_layout(resolution=0.1, padding=0, show_outline=True, show_comb_outline=True, show_screws=True, show_grooves=True, show_actuators=True, show_accelerometers=True, show_vleds=True, show_irleds=True, display_names=True):
     try :
-        f = open('./frame_layout.json', "r")
+        package_path = os.path.dirname(__file__)
+        f = open(package_path + '/frame_layout.json', "r")
         config = json.load(f)
         f.close()
     except :
         print('No layout provided. Quitting')
         return None
     img = _draw_frame_layout(
+        config,
         resolution=resolution,
         padding=padding,
         show_outline=show_outline,
@@ -31,12 +35,13 @@ def get_frame_layout(resolution=1, padding=0, show_outline=True, show_comb_outli
     )
     return img
 
-def _draw_frame_layout(layout, resolution=1, padding=0, show_outline=True, show_comb_outline=True, show_screws=True, show_grooves=True, show_actuators=True, show_accelerometers=True, show_vleds=True, show_irleds=True, display_names=True):
+def _draw_frame_layout(layout, resolution=0.1, padding=0, show_outline=True, show_comb_outline=True, show_screws=True, show_grooves=True, show_actuators=True, show_accelerometers=True, show_vleds=True, show_irleds=True, display_names=True):
 
     CV2_FILLED_SHAPE        = -1
+    LINES_THICKNESS         = 3
 
     OUTLINE_COLOR           = (255, 255, 255)
-    OUTLINE_THICKNESS       = 3
+    OUTLINE_THICKNESS       = LINES_THICKNESS
 
     SCREW_COLOR             = (128, 128, 128)
     SCREW_THICKNESS         = CV2_FILLED_SHAPE
@@ -45,7 +50,7 @@ def _draw_frame_layout(layout, resolution=1, padding=0, show_outline=True, show_
     GROOVE_THICKNESS        = CV2_FILLED_SHAPE
 
     ACTUATOR_COLOR          = (255, 255, 0)
-    ACTUATOR_THICKNESS      = 3
+    ACTUATOR_THICKNESS      = LINES_THICKNESS
 
     ACCELEROMETER_COLOR     = (0, 255, 0)
     ACCELEROMETER_THICKNESS = CV2_FILLED_SHAPE
@@ -57,7 +62,7 @@ def _draw_frame_layout(layout, resolution=1, padding=0, show_outline=True, show_
     IRLEDS_THICKNESS        = CV2_FILLED_SHAPE
 
     TEXT_SIZE               = 2
-    TEXT_THICKNESS          = 2
+    TEXT_THICKNESS          = 1
     # Outer image size
     min_x = 0
     min_y = 0
